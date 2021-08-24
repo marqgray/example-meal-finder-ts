@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "none",
+    "target": "es5",
+    "sourceMap": true,
+    "typeRoots": [
+      "defs/meal-finder-api.d.ts"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
