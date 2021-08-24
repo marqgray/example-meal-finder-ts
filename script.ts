@@ -12,6 +12,9 @@ const app = new (class {
     this.htmlElements.submit.addEventListener("submit", (e) =>
       this.searchMeal(e)
     );
+    this.htmlElements.random.addEventListener("click", () =>
+      this.getRandomMeal()
+    );
     this.htmlElements.mealsElement.addEventListener("click", (e: any) => {
       const mealInfo = e.path.find((item) => {
         if (item.classList) {
@@ -25,6 +28,18 @@ const app = new (class {
         this.getMealById(mealID);
       }
     });
+  }
+
+  getRandomMeal() {
+    this.htmlElements.mealsElement.innerHTML = "";
+    this.htmlElements.resultHeading.innerHTML = "";
+
+    fetch(`http://www.themealdb.com/api/json/v1/1/random.php`)
+      .then((res) => res.json())
+      .then((data: MealFinderApi) => {
+        const meal = data.meals[0];
+        this.addMealToDom(meal);
+      });
   }
 
   getMealById(mealId) {
