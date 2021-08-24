@@ -1,0 +1,66 @@
+const app = new (class {
+  htmlElements = {
+    search: <HTMLInputElement>document.getElementById("search"),
+    submit: <HTMLFormElement>document.getElementById("submit"),
+    random: <HTMLButtonElement>document.getElementById("random"),
+    mealsElement: <HTMLDivElement>document.getElementById("meals"),
+    resultHeading: <HTMLDivElement>document.getElementById("result-heading"),
+    singleMealElement: <HTMLDivElement>document.getElementById("single-meal"),
+  };
+
+  constructor() {
+    this.htmlElements.submit.addEventListener("submit", (e) =>
+      this.searchMeal(e)
+    );
+    this.htmlElements.mealsElement.addEventListener("click", (e: any) => {
+      const mealInfo = e.path.find((item) => {
+        if (item.classList) {
+          return item.classList.contains("meal-info");
+        } else {
+          return false;
+        }
+      });
+      if (mealInfo) {
+        const mealID = mealInfo.getAttribute("data-mealid");
+        this.getMealById(mealID);
+      }
+    });
+  }
+
+  getMealById(mealId) {
+    fetch(`http://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`)
+      .then((res) => res.json())
+      .then((data) => {});
+  }
+
+  searchMeal(e) {
+    e.preventDefault();
+    this.htmlElements.singleMealElement.innerHTML = "";
+    const term = this.htmlElements.search.value;
+    if (term.trim()) {
+      fetch(`http://www.themealdb.com/api/json/v1/1/search.php?s=${term}`)
+        .then((res) => res.json())
+        .then((data: MealFinderApi) => {
+          this.htmlElements.resultHeading.innerHTML = `<h2>Search results for "${term}":</h2>`;
+          if (data === null) {
+            this.htmlElements.resultHeading.innerHTML = `<p>There are no search results. Try again!</p>`;
+          } else {
+            this.htmlElements.mealsElement.innerHTML = data.meals
+              .map(
+                (meal) => `
+              <div class="meal">
+                <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+                <div class="meal-info" data-mealID="${meal.idMeal}">
+                    <h3>${meal.strMeal}</h3>
+                </div>
+              </div>`
+              )
+              .join("");
+          }
+        });
+      this.htmlElements.search.value = "";
+    } else {
+      alert("Please enter a search term");
+    }
+  }
+})();
